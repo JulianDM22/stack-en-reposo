@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Stack en Reposo · Simulador de horas-instancia</title>
-<meta name="description" content="Prototipo académico: simula cuántas horas-instancia de ambientes no productivos (DEV, TEST, STAGING) se dejan de usar al apagarlos fuera del horario laboral.">
+<meta name="description" content="Prototipo académico: muestra, en lenguaje sencillo, cuántas horas de computadores en la nube se dejan de usar al apagar los ambientes de desarrollo y pruebas fuera del horario laboral.">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -19,91 +19,231 @@
       <circle cx="12" cy="36" r="1.8" class="dot-off"/>
     </svg>
     <div>
-      <h1>Stack en Reposo</h1>
+      <p class="name">Stack en Reposo</p>
       <p class="tag">Simulador de horas-instancia para ambientes no productivos</p>
     </div>
   </div>
-  <p class="context">Prototipo académico · Caso hipotético <strong>Software Neiva S.A.S.</strong> · Periódico <em>Capa Física</em>, Ed. N.º 01</p>
+  <nav class="nav" aria-label="Secciones">
+    <a href="#idea">La idea</a><a href="#conceptos">Conceptos</a><a href="#simulador">Simulador</a><a href="#ecologia">¿Y el ambiente?</a><a href="#glosario">Glosario</a>
+  </nav>
 </header>
 
+<section class="hero" id="idea">
+  <div class="hero-text">
+    <p class="kicker">Prototipo académico · Caso hipotético Software Neiva S.A.S. · Periódico <em>Capa Física</em>, Ed. N.º 01</p>
+    <h1>De noche, nadie trabaja.<br><span>¿Por qué sus servidores sí?</span></h1>
+    <p class="lead">Una empresa de software tiene computadores alquilados en la nube para <strong>construir y probar</strong> sus aplicaciones. El equipo los usa de día, pero casi siempre quedan <strong>encendidos las 24 horas</strong>, como las luces de una oficina vacía. Este simulador calcula cuántas horas de uso se ahorrarían si se apagaran solos al terminar la jornada.</p>
+    <div class="hero-cta">
+      <a class="btn" href="#simulador">Probar el simulador</a>
+      <a class="btn ghost" href="#conceptos">Primero, explíquenme los términos</a>
+    </div>
+  </div>
+  <figure class="hero-art" aria-label="Ilustración: el mismo cuarto de servidores de día y de noche">
+    <svg viewBox="0 0 520 300" role="img" aria-hidden="true">
+      <defs>
+        <linearGradient id="sky-d" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f2c98f"/><stop offset="1" stop-color="#f6f3ec"/></linearGradient>
+        <linearGradient id="sky-n" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0d1814"/><stop offset="1" stop-color="#22362e"/></linearGradient>
+      </defs>
+      <rect x="0" y="0" width="255" height="300" rx="14" fill="url(#sky-d)"/>
+      <rect x="265" y="0" width="255" height="300" rx="14" fill="url(#sky-n)"/>
+      <circle cx="205" cy="52" r="24" fill="#e9a24f"/>
+      <circle cx="470" cy="50" r="20" fill="#e8e3d3"/><circle cx="480" cy="44" r="18" fill="#0f1b17"/>
+      <g fill="#e8e3d3"><circle cx="300" cy="40" r="1.6"/><circle cx="340" cy="70" r="1.2"/><circle cx="400" cy="30" r="1.4"/><circle cx="430" cy="90" r="1.1"/><circle cx="320" cy="105" r="1"/></g>
+      <text x="22" y="34" class="art-l">DE DÍA · 10:00</text>
+      <text x="287" y="34" class="art-l light">DE NOCHE · 02:00</text>
+      <g id="rack-day"></g>
+      <g id="rack-night"></g>
+      <text x="22" y="282" class="art-s">El equipo trabaja: todo encendido</text>
+      <text x="287" y="282" class="art-s light">Hoy: igual de encendido, sin nadie</text>
+    </svg>
+    <figcaption>Ilustración de elaboración propia.</figcaption>
+  </figure>
+</section>
+
 <main>
-  <section class="intro">
-    <p>Los ambientes <strong>DEV</strong>, <strong>TEST</strong> y <strong>STAGING</strong> suelen quedar encendidos las 24 horas aunque solo se usen en la jornada. Ingresa cuántas instancias tienes y el horario que propones: el simulador calcula las <strong>horas-instancia</strong> que se dejarían de consumir. <strong>PRODUCCIÓN</strong> no entra en el cálculo: permanece siempre disponible.</p>
+  <section class="howto" aria-label="Cómo usar el simulador">
+    <div class="how"><span class="n">1</span><p><strong>Elija un ejemplo</strong> o escriba los datos de su empresa.</p></div>
+    <div class="how"><span class="n">2</span><p><strong>Diga el horario</strong> en que el equipo trabaja.</p></div>
+    <div class="how"><span class="n">3</span><p><strong>Lea el resultado</strong> en palabras simples y en cifras.</p></div>
   </section>
 
-  <div class="grid">
-    <form id="form" class="panel" novalidate>
-      <h2><span class="step">1</span> Situación actual</h2>
-      <p class="hint">Valores de ejemplo, no datos reales. Cámbialos por los de tu equipo.</p>
-      <table class="envs">
-        <thead>
-          <tr><th scope="col">Ambiente</th><th scope="col">Instancias</th><th scope="col">Horas encendido / día</th><th scope="col">Días activos / mes</th></tr>
-        </thead>
-        <tbody id="env-rows"></tbody>
-      </table>
+  <section id="conceptos" class="concepts">
+    <h2 class="sec">Los términos, sin tecnicismos</h2>
+    <p class="sec-lead">Cinco palabras bastan para entender la herramienta. Si alguna se olvida, está también en el glosario del final.</p>
+    <div class="cards">
+      <article class="card">
+        <svg viewBox="0 0 40 40" aria-hidden="true"><rect x="7" y="6" width="26" height="8" rx="2"/><rect x="7" y="16" width="26" height="8" rx="2"/><rect x="7" y="26" width="26" height="8" rx="2"/><circle cx="12" cy="10" r="1.5" class="led"/><circle cx="12" cy="20" r="1.5" class="led"/><circle cx="12" cy="30" r="1.5" class="led"/></svg>
+        <h3>Instancia</h3>
+        <p>Un <strong>computador alquilado en la nube</strong>. No se ve en la oficina, pero existe: está encendido en un centro de datos, conectado a la red eléctrica.</p>
+      </article>
+      <article class="card">
+        <svg viewBox="0 0 40 40" aria-hidden="true"><rect x="4" y="10" width="9" height="20" rx="2" class="c1"/><rect x="15.5" y="10" width="9" height="20" rx="2" class="c2"/><rect x="27" y="10" width="9" height="20" rx="2" class="c3"/></svg>
+        <h3>DEV, TEST y STAGING</h3>
+        <p>Tres copias de la aplicación que solo usa el equipo: una para <strong>construir</strong> (DEV), otra para <strong>probar</strong> (TEST) y otra para el <strong>ensayo final</strong> antes de publicar (STAGING).</p>
+      </article>
+      <article class="card prod">
+        <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="13"/><path d="M14 20l4 4 8-9" class="tick"/></svg>
+        <h3>Producción</h3>
+        <p>La versión que usan los <strong>clientes</strong>. Debe estar disponible siempre, por eso <strong>nunca se apaga</strong> y no entra en este cálculo.</p>
+      </article>
+      <article class="card">
+        <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="14" class="ring"/><path d="M20 11v9l6 4" class="hand"/></svg>
+        <h3>Hora-instancia</h3>
+        <p>La unidad de medida: <strong>1 computador encendido durante 1 hora</strong>. Diez computadores encendidos 3 horas suman 30 horas-instancia.</p>
+      </article>
+      <article class="card">
+        <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 6l15 26H5z" class="warn"/><path d="M20 16v8M20 27v1" class="hand"/></svg>
+        <h3>Excepción</h3>
+        <p>Cuando hay una <strong>urgencia</strong> fuera de horario, alguien enciende el ambiente a propósito y queda registrado. Esas horas se suman al resultado.</p>
+      </article>
+    </div>
+    <p class="analogy"><strong>En una frase:</strong> es como apagar las luces de las oficinas vacías por la noche. Las oficinas siguen ahí y se encienden por la mañana; lo único que cambia es que no gastan mientras nadie las usa.</p>
+  </section>
 
-      <h2><span class="step">2</span> Horario propuesto</h2>
-      <div class="fields">
-        <label>Encendido <span class="unit">hora (0–23)</span>
-          <input type="number" id="inicio" min="0" max="23" step="1" inputmode="numeric"></label>
-        <label>Apagado <span class="unit">hora (1–24)</span>
-          <input type="number" id="fin" min="1" max="24" step="1" inputmode="numeric"></label>
-        <label>Días laborales / mes
-          <input type="number" id="dias" min="0" max="31" step="1" inputmode="numeric"></label>
-        <label>Excepciones / mes <span class="unit">horas-instancia</span>
-          <input type="number" id="excepciones" min="0" step="1" inputmode="numeric"></label>
-        <label>Meta de reducción <span class="unit">%</span>
-          <input type="number" id="meta" min="1" max="100" step="1" inputmode="numeric"></label>
+  <section id="simulador">
+    <h2 class="sec">El simulador</h2>
+    <div class="presets" role="group" aria-label="Ejemplos listos">
+      <span class="presets-l">Ejemplos listos:</span>
+      <button type="button" class="chip" data-preset="neiva">Caso Software Neiva</button>
+      <button type="button" class="chip" data-preset="pequena">Empresa pequeña</button>
+      <button type="button" class="chip" data-preset="corta">Jornada corta (8 a 18)</button>
+      <button type="button" class="chip" data-preset="urgencias">Muchas urgencias nocturnas</button>
+    </div>
+    <p class="preset-note" id="preset-note"></p>
+
+    <div class="grid">
+      <form id="form" class="panel" novalidate>
+        <h3 class="ph"><span class="step">1</span> ¿Cómo están hoy?</h3>
+        <p class="hint">Valores de ejemplo, no datos reales. Cámbielos libremente: el resultado se actualiza solo.</p>
+        <table class="envs">
+          <thead>
+            <tr><th scope="col">Copia</th><th scope="col">¿Cuántos computadores?</th><th scope="col">Horas encendidos al día</th><th scope="col">Días encendidos al mes</th></tr>
+          </thead>
+          <tbody id="env-rows"></tbody>
+        </table>
+        <p class="hint small">24 horas y 30 días significa «nunca se apagan», que es lo más común.</p>
+
+        <h3 class="ph"><span class="step">2</span> ¿Cuándo trabaja el equipo?</h3>
+        <div class="fields">
+          <label>Hora de entrada <span class="unit">los computadores se encienden (0 a 23)</span>
+            <input type="number" id="inicio" min="0" max="23" step="1" inputmode="numeric"></label>
+          <label>Hora de salida <span class="unit">se apagan solos (1 a 24)</span>
+            <input type="number" id="fin" min="1" max="24" step="1" inputmode="numeric"></label>
+          <label>Días de trabajo al mes <span class="unit">sin fines de semana ni festivos</span>
+            <input type="number" id="dias" min="0" max="31" step="1" inputmode="numeric"></label>
+          <label>Horas por urgencias al mes <span class="unit">encendidos extra, autorizados</span>
+            <input type="number" id="excepciones" min="0" step="1" inputmode="numeric"></label>
+          <label>Meta de ahorro <span class="unit">% (el grupo propone 45)</span>
+            <input type="number" id="meta" min="1" max="100" step="1" inputmode="numeric"></label>
+        </div>
+        <p id="errores" class="errors" role="alert" hidden></p>
+        <div class="actions">
+          <button type="button" id="reset" class="secondary">Volver al ejemplo inicial</button>
+        </div>
+      </form>
+
+      <section class="panel results" aria-live="polite">
+        <h3 class="ph"><span class="step">3</span> Resultado del mes</h3>
+        <div class="plain" id="plain"></div>
+
+        <div class="kpis">
+          <div class="kpi"><span class="k-label">Hoy</span><span class="k-value" id="k-actual">–</span><span class="k-unit">horas-instancia al mes</span></div>
+          <div class="kpi"><span class="k-label">Con el horario</span><span class="k-value" id="k-propuesto">–</span><span class="k-unit">horas-instancia al mes</span></div>
+          <div class="kpi"><span class="k-label">Ahorro</span><span class="k-value" id="k-abs">–</span><span class="k-unit">horas-instancia al mes</span></div>
+          <div class="kpi accent"><span class="k-label">Ahorro</span><span class="k-value" id="k-pct">–</span><span class="k-unit">menos que hoy</span></div>
+        </div>
+
+        <div class="compare" aria-hidden="true">
+          <div class="bar-row"><span>Hoy</span><div class="track"><div class="bar before" id="bar-before"></div></div></div>
+          <div class="bar-row"><span>Con horario</span><div class="track"><div class="bar after" id="bar-after"></div></div></div>
+        </div>
+
+        <div class="goal">
+          <div class="goal-head"><span>¿Se cumple la meta?</span><span id="goal-text">–</span></div>
+          <div class="progress"><div class="progress-fill" id="progress"></div><div class="progress-mark" id="goal-mark" title="Meta"></div></div>
+          <p class="verdict" id="verdict">–</p>
+        </div>
+      </section>
+    </div>
+
+    <section class="panel walk">
+      <div class="walk-head">
+        <h3 class="ph"><span class="step">4</span> Recorra un día completo</h3>
+        <div class="walk-ctrl">
+          <div class="seg" role="group" aria-label="Tipo de día">
+            <button type="button" class="seg-b on" data-dia="laboral">Día de trabajo</button>
+            <button type="button" class="seg-b" data-dia="libre">Fin de semana o festivo</button>
+          </div>
+        </div>
       </div>
-      <p class="hint">Las <strong>excepciones</strong> son encendidos fuera de horario aprobados y registrados (por ejemplo, un incidente de madrugada). Suman horas al escenario propuesto.</p>
-      <p id="errores" class="errors" role="alert" hidden></p>
-      <div class="actions">
-        <button type="button" id="reset" class="secondary">Restablecer valores de ejemplo</button>
+      <p class="hint">Mueva la barra para cambiar la hora. Cada cuadrito es un computador de los que escribió arriba: <span class="sw on"></span> encendido · <span class="sw off"></span> apagado.</p>
+      <div class="clock">
+        <span class="sky" id="sky" aria-hidden="true"></span>
+        <output id="hora-l" for="hora">22:00</output>
+        <input type="range" id="hora" min="0" max="23" step="1" value="22" aria-label="Hora del día">
       </div>
-    </form>
-
-    <section class="panel results" aria-live="polite">
-      <h2><span class="step">3</span> Resultado mensual</h2>
-      <div class="kpis">
-        <div class="kpi"><span class="k-label">Horas-instancia actuales</span><span class="k-value" id="k-actual">–</span></div>
-        <div class="kpi"><span class="k-label">Horas-instancia propuestas</span><span class="k-value" id="k-propuesto">–</span></div>
-        <div class="kpi"><span class="k-label">Reducción absoluta</span><span class="k-value" id="k-abs">–</span></div>
-        <div class="kpi accent"><span class="k-label">Reducción porcentual</span><span class="k-value" id="k-pct">–</span></div>
+      <div class="fleet">
+        <div class="fleet-row"><span class="fleet-l">Hoy</span><div class="servers" id="f-hoy"></div><span class="fleet-c" id="c-hoy"></span></div>
+        <div class="fleet-row"><span class="fleet-l">Con Stack en Reposo</span><div class="servers" id="f-prop"></div><span class="fleet-c" id="c-prop"></span></div>
       </div>
+      <p class="walk-msg" id="walk-msg"></p>
 
-      <div class="compare" aria-hidden="true">
-        <div class="bar-row"><span>Antes</span><div class="track"><div class="bar before" id="bar-before"></div></div></div>
-        <div class="bar-row"><span>Después</span><div class="track"><div class="bar after" id="bar-after"></div></div></div>
-      </div>
-
-      <div class="goal">
-        <div class="goal-head"><span>Avance frente a la meta</span><span id="goal-text">–</span></div>
-        <div class="progress"><div class="progress-fill" id="progress"></div><div class="progress-mark" id="goal-mark"></div></div>
-        <p class="verdict" id="verdict">–</p>
-      </div>
-
-      <h3>Un día típico por ambiente</h3>
-      <div class="day" id="day" aria-hidden="true"></div>
-      <div class="day-legend"><span class="sw on"></span> Encendido según horario <span class="sw off"></span> Apagado (reposo)</div>
-
-      <table class="detail">
-        <thead><tr><th scope="col">Ambiente</th><th scope="col">Actual</th><th scope="col">Propuesto</th><th scope="col">Reducción</th></tr></thead>
-        <tbody id="detail-rows"></tbody>
-      </table>
+      <details class="more">
+        <summary>Ver el día hora por hora y la tabla por copia</summary>
+        <div class="day" id="day" aria-hidden="true"></div>
+        <div class="day-legend"><span class="sw on"></span> Encendido según el horario propuesto <span class="sw off"></span> Apagado (en reposo)</div>
+        <table class="detail">
+          <thead><tr><th scope="col">Copia</th><th scope="col">Hoy</th><th scope="col">Con horario</th><th scope="col">Ahorro</th></tr></thead>
+          <tbody id="detail-rows"></tbody>
+        </table>
+      </details>
     </section>
-  </div>
+  </section>
+
+  <section id="ecologia" class="eco">
+    <h2 class="sec">¿Y esto qué tiene que ver con el medio ambiente?</h2>
+    <p class="sec-lead">Cada hora-instancia es tiempo de uso de una máquina física. Apagar no es un gesto simbólico: reduce el uso de toda esta cadena.</p>
+    <ol class="chain">
+      <li><b>Código</b><span>La aplicación que escribe el equipo.</span></li>
+      <li><b>Servidor</b><span>Corre en computadores reales de un centro de datos.</span></li>
+      <li><b>Electricidad</b><span>Que los alimenta y los enfría, de día y de noche.</span></li>
+      <li><b>Equipos</b><span>Fabricados con metales y minerales extraídos de la Tierra.</span></li>
+      <li><b>Residuos</b><span>Al final de su vida útil se vuelven basura electrónica (RAEE).</span></li>
+    </ol>
+    <div class="eco-facts">
+      <p class="fact"><b>415 TWh</b> consumieron los centros de datos del mundo en 2024, cerca del 1,5 % de la electricidad mundial. <span class="src">Fuente: <a href="https://www.iea.org/reports/energy-and-ai/executive-summary">IEA (2025), <em>Energy and AI</em></a>.</span></p>
+      <p class="fact honest"><b>¿Por qué no mostramos kWh ni CO₂?</b> Porque la energía de una hora-instancia depende del tipo de máquina y del proveedor de nube, y no tenemos esos datos. Preferimos medir bien lo que sí se puede medir: horas de uso. Es el indicador que la empresa vigila dentro de su sistema ISO 14001.</p>
+    </div>
+  </section>
 
   <aside class="note">
     <h2>Nota metodológica</h2>
     <p><strong>Las horas-instancia son una métrica operacional de utilización. Para estimar energía o emisiones se requieren datos adicionales del proveedor de infraestructura.</strong> Por eso este simulador no convierte el resultado a kWh, CO₂ ni toneladas de carbono.</p>
-    <p>Cálculo: horas-instancia = instancias × horas encendidas al día × días activos al mes. En el escenario propuesto, cada ambiente queda encendido solo dentro del horario y los días laborales indicados, y luego se suman las excepciones. La meta del 45 % en seis meses es una <em>propuesta académica del grupo</em>, no una exigencia de ISO 14001.</p>
-    <p>Qué no hace todavía: no se conecta a la consola ni a la facturación de un proveedor cloud, no apaga nada por sí mismo y no guarda datos. Es una herramienta para planificar y explicar la decisión técnica.</p>
+    <p>Cálculo: horas-instancia = computadores × horas encendidas al día × días encendidos al mes. Con el horario propuesto, cada copia queda encendida solo entre la hora de entrada y la de salida, y solo los días de trabajo; luego se suman las horas por urgencias. La meta del 45 % en seis meses es una <em>propuesta académica del grupo</em>, no una exigencia de ISO 14001.</p>
+    <p>Qué no hace todavía: no se conecta a la consola ni a la facturación de un proveedor de nube, no apaga nada por sí mismo y no guarda datos. Es una herramienta para planificar y explicar la decisión técnica.</p>
   </aside>
+
+  <section id="glosario" class="glossary">
+    <h2 class="sec">Glosario</h2>
+    <dl>
+      <dt>Nube</dt><dd>Computadores de otra empresa (un proveedor) que se alquilan por horas a través de internet. Están en centros de datos reales.</dd>
+      <dt>Instancia</dt><dd>Un computador alquilado en la nube.</dd>
+      <dt>Ambiente</dt><dd>Una copia completa de la aplicación con sus computadores. Aquí se llaman «copias» para simplificar.</dd>
+      <dt>DEV · TEST · STAGING</dt><dd>Copias para construir, probar y hacer el ensayo final. Solo las usa el equipo, en horario de trabajo.</dd>
+      <dt>Producción</dt><dd>La copia que usan los clientes. Siempre encendida.</dd>
+      <dt>Hora-instancia</dt><dd>Un computador encendido durante una hora. Es el indicador del proyecto.</dd>
+      <dt>Excepción</dt><dd>Un encendido fuera de horario, autorizado y registrado (quién, cuándo y por qué), por ejemplo por una urgencia de madrugada.</dd>
+      <dt>DevOps / Infraestructura</dt><dd>El equipo que administra los servidores. Es el responsable de programar el apagado.</dd>
+      <dt>ISO 14001</dt><dd>Norma internacional para organizar la gestión ambiental de una empresa: identificar impactos, fijar metas, medir y mejorar.</dd>
+      <dt>PHVA</dt><dd>Planear, Hacer, Verificar y Actuar: el ciclo de mejora continua de ISO 14001. Este simulador ayuda en Planear y en Verificar.</dd>
+      <dt>RAEE</dt><dd>Residuos de aparatos eléctricos y electrónicos: la basura electrónica.</dd>
+    </dl>
+  </section>
 </main>
 
 <footer class="foot">
   <p>Proyecto final · Ingeniería de Software · Universidad Surcolombiana · Alvaro Julian Delgado Mena, William Steven Bonilla Diaz, Andrés Esteban González Patiño</p>
-  <p>Funciona sin instalar nada y sin enviar datos a ningún servidor: todo se calcula en tu navegador.</p>
+  <p>Funciona sin instalar nada y sin enviar datos a ningún servidor: todo se calcula en su navegador.</p>
 </footer>
 
 <script src="script.js"></script>
