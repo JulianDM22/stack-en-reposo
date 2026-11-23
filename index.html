@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stack en Reposo · Simulador de horas-instancia</title>
+<meta name="description" content="Prototipo académico: simula cuántas horas-instancia de ambientes no productivos (DEV, TEST, STAGING) se dejan de usar al apagarlos fuera del horario laboral.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <svg class="logo" viewBox="0 0 48 48" aria-hidden="true">
+      <rect x="6" y="8" width="36" height="8" rx="2"/>
+      <rect x="6" y="20" width="36" height="8" rx="2"/>
+      <rect x="6" y="32" width="36" height="8" rx="2" class="off"/>
+      <circle cx="12" cy="12" r="1.8" class="dot"/>
+      <circle cx="12" cy="24" r="1.8" class="dot"/>
+      <circle cx="12" cy="36" r="1.8" class="dot-off"/>
+    </svg>
+    <div>
+      <h1>Stack en Reposo</h1>
+      <p class="tag">Simulador de horas-instancia para ambientes no productivos</p>
+    </div>
+  </div>
+  <p class="context">Prototipo académico · Caso hipotético <strong>Software Neiva S.A.S.</strong> · Periódico <em>Capa Física</em>, Ed. N.º 01</p>
+</header>
+
+<main>
+  <section class="intro">
+    <p>Los ambientes <strong>DEV</strong>, <strong>TEST</strong> y <strong>STAGING</strong> suelen quedar encendidos las 24 horas aunque solo se usen en la jornada. Ingresa cuántas instancias tienes y el horario que propones: el simulador calcula las <strong>horas-instancia</strong> que se dejarían de consumir. <strong>PRODUCCIÓN</strong> no entra en el cálculo: permanece siempre disponible.</p>
+  </section>
+
+  <div class="grid">
+    <form id="form" class="panel" novalidate>
+      <h2><span class="step">1</span> Situación actual</h2>
+      <p class="hint">Valores de ejemplo, no datos reales. Cámbialos por los de tu equipo.</p>
+      <table class="envs">
+        <thead>
+          <tr><th scope="col">Ambiente</th><th scope="col">Instancias</th><th scope="col">Horas encendido / día</th><th scope="col">Días activos / mes</th></tr>
+        </thead>
+        <tbody id="env-rows"></tbody>
+      </table>
+
+      <h2><span class="step">2</span> Horario propuesto</h2>
+      <div class="fields">
+        <label>Encendido <span class="unit">hora (0–23)</span>
+          <input type="number" id="inicio" min="0" max="23" step="1" inputmode="numeric"></label>
+        <label>Apagado <span class="unit">hora (1–24)</span>
+          <input type="number" id="fin" min="1" max="24" step="1" inputmode="numeric"></label>
+        <label>Días laborales / mes
+          <input type="number" id="dias" min="0" max="31" step="1" inputmode="numeric"></label>
+        <label>Excepciones / mes <span class="unit">horas-instancia</span>
+          <input type="number" id="excepciones" min="0" step="1" inputmode="numeric"></label>
+        <label>Meta de reducción <span class="unit">%</span>
+          <input type="number" id="meta" min="1" max="100" step="1" inputmode="numeric"></label>
+      </div>
+      <p class="hint">Las <strong>excepciones</strong> son encendidos fuera de horario aprobados y registrados (por ejemplo, un incidente de madrugada). Suman horas al escenario propuesto.</p>
+      <p id="errores" class="errors" role="alert" hidden></p>
+      <div class="actions">
+        <button type="button" id="reset" class="secondary">Restablecer valores de ejemplo</button>
+      </div>
+    </form>
+
+    <section class="panel results" aria-live="polite">
+      <h2><span class="step">3</span> Resultado mensual</h2>
+      <div class="kpis">
+        <div class="kpi"><span class="k-label">Horas-instancia actuales</span><span class="k-value" id="k-actual">–</span></div>
+        <div class="kpi"><span class="k-label">Horas-instancia propuestas</span><span class="k-value" id="k-propuesto">–</span></div>
+        <div class="kpi"><span class="k-label">Reducción absoluta</span><span class="k-value" id="k-abs">–</span></div>
+        <div class="kpi accent"><span class="k-label">Reducción porcentual</span><span class="k-value" id="k-pct">–</span></div>
+      </div>
+
+      <div class="compare" aria-hidden="true">
+        <div class="bar-row"><span>Antes</span><div class="track"><div class="bar before" id="bar-before"></div></div></div>
+        <div class="bar-row"><span>Después</span><div class="track"><div class="bar after" id="bar-after"></div></div></div>
+      </div>
+
+      <div class="goal">
+        <div class="goal-head"><span>Avance frente a la meta</span><span id="goal-text">–</span></div>
+        <div class="progress"><div class="progress-fill" id="progress"></div><div class="progress-mark" id="goal-mark"></div></div>
+        <p class="verdict" id="verdict">–</p>
+      </div>
+
+      <h3>Un día típico por ambiente</h3>
+      <div class="day" id="day" aria-hidden="true"></div>
+      <div class="day-legend"><span class="sw on"></span> Encendido según horario <span class="sw off"></span> Apagado (reposo)</div>
+
+      <table class="detail">
+        <thead><tr><th scope="col">Ambiente</th><th scope="col">Actual</th><th scope="col">Propuesto</th><th scope="col">Reducción</th></tr></thead>
+        <tbody id="detail-rows"></tbody>
+      </table>
+    </section>
+  </div>
+
+  <aside class="note">
+    <h2>Nota metodológica</h2>
+    <p><strong>Las horas-instancia son una métrica operacional de utilización. Para estimar energía o emisiones se requieren datos adicionales del proveedor de infraestructura.</strong> Por eso este simulador no convierte el resultado a kWh, CO₂ ni toneladas de carbono.</p>
+    <p>Cálculo: horas-instancia = instancias × horas encendidas al día × días activos al mes. En el escenario propuesto, cada ambiente queda encendido solo dentro del horario y los días laborales indicados, y luego se suman las excepciones. La meta del 45 % en seis meses es una <em>propuesta académica del grupo</em>, no una exigencia de ISO 14001.</p>
+    <p>Qué no hace todavía: no se conecta a la consola ni a la facturación de un proveedor cloud, no apaga nada por sí mismo y no guarda datos. Es una herramienta para planificar y explicar la decisión técnica.</p>
+  </aside>
+</main>
+
+<footer class="foot">
+  <p>Proyecto final · Ingeniería de Software · Universidad Surcolombiana · Alvaro Julian Delgado Mena, William Steven Bonilla Diaz, Andrés Esteban González Patiño</p>
+  <p>Funciona sin instalar nada y sin enviar datos a ningún servidor: todo se calcula en tu navegador.</p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
